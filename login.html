@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/login.css" />
+    <title>Login</title>
+</head>
+
+<body>
+    <main class="main">
+        <div class="left_div">
+            <a class="logo prm" href="main.html">Meteor<span class="logo sgn">.ino</span></a>
+            <h2 class="uc">Projeto Integrado de Telecomunicações e Informática</h2>
+            <a href="https://www.eng.uminho.pt/pt">
+                <img src="../res/uminho.png" alt="logo_uminho.png">
+            </a>
+        </div>
+        <div class="rigth_div">
+            <input class="entry" id="email" type="email" placeholder="Email">
+            <input class="entry" id="password" type="password" placeholder="Password">
+            <button class="bt_login" onclick="login()">Login</button>
+            <a class="other_option_login" href="./register.html">Registar</a>
+        </div>
+
+    </main>
+    <div class="social_div">
+        <a class="social" href="https://github.com/tiagojoseas/Projeto-Integrado-de-Telecomunicacoes"
+            class="fa fa-github"></a>
+    </div>
+</body>
+<script>
+    console.log(">> Start Login")
+
+    let email = document.getElementById("email")
+    let password = document.getElementById("password")
+
+    email.addEventListener("keyup", function (event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            login()
+        }
+    })
+    password.addEventListener("keyup", function (event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            login()
+        }
+    })
+
+    function login() {
+        console.log(email.value, password.value)
+        let headersList = {
+            "Content-Type": "application/json"
+        }
+
+        let bodyContent = JSON.stringify({
+            "email": `${email.value}`,
+            "password": `${password.value}`,
+        });
+
+        fetch("http://localhost:8080/login/", {
+            method: "POST",
+            body: bodyContent,
+            headers: headersList
+        }).then(function (response) {
+            if (response.status == 200) {
+                location.replace('./main.html');
+            } else {
+                alert("Dados Invalidos")
+            }
+        })
+
+    };
+
+</script>
+
+</html>
