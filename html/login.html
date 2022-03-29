@@ -5,31 +5,37 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="../css/login.css" />
     <title>Login</title>
 </head>
 
 <body>
     <main class="main">
         <div class="left_div">
-            <a class="logo prm" href="main.html">Meteor<span class="logo sgn">.ino</span></a>
+            <a class="logo prm" href="../index.html">Meteor<span class="logo sgn">.ino</span></a>
             <h2 class="uc">Projeto Integrado de Telecomunicações e Informática</h2>
             <a href="https://www.eng.uminho.pt/pt">
-                <img src="uminho.png" alt="logo_uminho.png">
+                <img src="../res/uminho.png" alt="logo_uminho.png">
             </a>
         </div>
         <div class="rigth_div">
             <input class="entry" id="email" type="email" placeholder="Email">
             <input class="entry" id="password" type="password" placeholder="Password">
             <button class="bt_login" onclick="login()">Login</button>
-            <a class="other_option_login" href="register.html">Registar</a>
+            <a class="other_option_login" href="./register.html">Registar</a>
         </div>
 
     </main>
-    <div class="social_div">
-        <a class="social" href="https://github.com/tiagojoseas/Projeto-Integrado-de-Telecomunicacoes"
-            class="fa fa-github"></a>
-    </div>
+    <footer>
+        <a href="https://www.eng.uminho.pt/pt">
+            <img class="logo" src="../res/qr_code_github.svg" alt="qr_code.svg">
+        </a>
+        <a href="https://netiuminho.github.io">
+            <img class="logo" src="../res/netium.png" alt="logo_netium.png">
+        </a>
+        <!--img class="qr" src="../res/qr_code_github.svg" alt="">
+        <a href="https://github.com/tiagojoseas/Projeto-Integrado-de-Telecomunicacoes" class="fa fa-github"></a-->
+    </footer>
 </body>
 <script>
     console.log(">> Start Login")
