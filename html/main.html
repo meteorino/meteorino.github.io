@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteorino</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <video autoplay muted loop id="myVideo">
+        <source src="res/sun.mp4" type="video/mp4">
+    </video>
+    <header class="header">
+        <a class="logo" href="main.html">Meteor<span class="ino">.ino</span></a>
+        <nav class="buttons">
+            <a class="btEntrar" href="login.html">Entrar</a>
+            <a class="btRegistar" href="register.html">Registar</a>
+        </nav>
+    </header>
+    <main>
+        <div class="weather">  
+            <div class="other_info">
+                <div class="row">
+                    <p id="temp"></p>
+                    <span id="icon_weather" class="material-icons">wb_sunny</span>
+                </div>
+                <p id="city">Porto</p>
+                <p id="date"><span id="hour"></span></p>
+                <div class="other">
+                    <span id="icon" class="material-icons">water_drop</span>
+                    <p id="humidity"></p>
+                </div>
+                <div class="other">
+                    <span id="icon" class="material-icons">landscape</span>
+                    <p id="heigth"></p>
+                </div>
+                <div class="other">
+                    <span id="icon" class="material-icons">air</span>
+                    <p id="pression"></p>
+                </div>
+                <div class="other">
+                    <span id="icon" class="material-icons">lightbulb</span>
+                    <p id="lumos"></p>
+                </div>
+            </div>
+        </div>
+        <div class="history">
+            <ol id="list"></ol>
+        </div>
+
+    </main>
+    <script src="../js/"></script>
+</body>
+
+</html>
