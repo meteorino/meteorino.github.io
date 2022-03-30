@@ -1,59 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./styles.css" />
     <title>Meteorino</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
-    <video autoplay muted loop id="myVideo">
-        <source src="#" type="video/mp4">
-    </video>
-    <header class="header">
-        <a class="logo" href="index.html">Meteor<span class="ino">.ino</span></a>
-        <nav class="buttons">
-            <a class="btEntrar" href="./html/login.html">Entrar</a>
-            <a class="btRegistar" href="./html/register.html">Registar</a>
-        </nav>
-    </header>
+    <nav>
+        <button>Button</button>
+        <input type="range" id="points" name="points" min="0" max="10">
+    </nav>
     <main>
-        <div class="weather">  
-            <div class="other_info">
-                <div class="row">
-                    <p id="temp"></p>
-                    <span id="icon_weather" class="material-icons">wb_sunny</span>
-                </div>
-                <p id="city">Porto</p>
-                <p id="date"><span id="hour"></span></p>
-                <div class="other">
-                    <span id="icon" class="material-icons">water_drop</span>
-                    <p id="humidity"></p>
-                </div>
-                <div class="other">
-                    <span id="icon" class="material-icons">landscape</span>
-                    <p id="heigth"></p>
-                </div>
-                <div class="other">
-                    <span id="icon" class="material-icons">air</span>
-                    <p id="pression"></p>
-                </div>
-                <div class="other">
-                    <span id="icon" class="material-icons">lightbulb</span>
-                    <p id="lumos"></p>
-                </div>
-            </div>
-        </div>
-        <div class="history">
-            <ol id="list"></ol>
-        </div>
-
+        <h2>Temperatura</h2>
+        <canvas id="chartTemp" class="chart"></canvas>
+        <h2>Humidade</h2>
+        <canvas id="chartHum" class="chart"></canvas>
+        <h2>Pressão Atmosférica</h2>
+        <canvas id="chartPress" class="chart"></canvas>
+        <h2>Altitude</h2>
+        <canvas id="chartHeight" class="chart"></canvas>
+        <h2>Luminosidade</h2>
+        <canvas id="chartLux" class="chart"></canvas>
     </main>
-    <script src=""></script>
+
 </body>
+<script>
+    var arr_time = [];
+    var arr_temp = [];
+    var arr_hum = [];
+    var arr_press = [];
+    var arr_heigth = [];
+    var arr_lux = [];
+
+    var last_element = 10
+
+    fetch("http://localhost:8080/entries/")
+        .then(function (response) {
+            return response.json();
+        }).then(function (entries) {
+            const last_entries = entries.slice(-last_element)
+            last_entries.forEach(entry => {
+                arr_time.push(hh_mm(entry.time_stamp))
+                arr_temp.push(entry.temperature)
+                arr_hum.push(entry.humidity)
+                arr_press.push(entry.pression)
+                arr_heigth.push(entry.height)
+                arr_lux.push(entry.lux)
+            });
+
+
+            designChart("chartTemp", arr_time, arr_temp)
+            designChart("chartHum", arr_time, arr_hum)
+            designChart("chartPress", arr_time, arr_press)
+            designChart("chartHeight", arr_time, arr_heigth)
+            designChart("chartLux", arr_time, arr_lux)
+
+        })
+
+    function hh_mm(time_stamp) {
+        const date = new Date(time_stamp)
+        return date.toLocaleTimeString('default', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+
+    function designChart(chartName, xValues, yValues) {
+        graph = document.getElementById(chartName).getContext("2d")
+
+        var gradientFill = graph.createLinearGradient(0, 0, 0, 500);
+        gradientFill.addColorStop(0, "#1085ebaa");
+        gradientFill.addColorStop(1, "#1085eb00");
+
+        
+        new Chart(chartName, {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    fill: true,
+                    backgroundColor: gradientFill, // Put the gradient here as a fill color
+                    borderColor: "#1085eb",
+                    borderWidth: 3,
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: { display: false },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: Math.min(...yValues),
+                            max: Math.max(...yValues)
+                        },
+                        gridLines: {
+                            drawTicks: false,
+                            display: false
+                        }
+                    }],
+                }
+            }
+        });
+    }
+
+    window.setTimeout( function() {
+  window.location.reload();
+}, 20000);
+</script>
 
 </html>
