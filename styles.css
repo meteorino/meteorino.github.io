@@ -8,7 +8,7 @@
 
 body {
     font-family: "Poppins";
-    background-color: #0d0d0f;
+    background-color: var(--white);
 }
 
 /******** NAV *******/
@@ -25,5 +25,5 @@ main {
 }
 
 h2 {
-    color: var(--white);
+    color: var(--black);
 }

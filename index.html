@@ -15,6 +15,14 @@
     <nav>
         <button>Button</button>
         <input type="range" id="points" name="points" min="0" max="10">
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Dropdown Button</button>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item">Link 1</a>
+                <a href="#" class="dropdown-item">Link 2</a>
+                <a href="#" class="dropdown-item">Link 3</a>
+            </div>
+        </div>
     </nav>
     <main>
         <h2>Temperatura</h2>
@@ -40,12 +48,14 @@
 
     var last_element = 10
 
-    fetch("http://localhost:8080/entries/")
+    fetch("http://localhost:8080/entries/id_station=0")
         .then(function (response) {
             return response.json();
         }).then(function (entries) {
+            console.log(entries)
             const last_entries = entries.slice(-last_element)
             last_entries.forEach(entry => {
+                // adicionar a cada array as variaveis
                 arr_time.push(hh_mm(entry.time_stamp))
                 arr_temp.push(entry.temperature)
                 arr_hum.push(entry.humidity)
@@ -54,7 +64,7 @@
                 arr_lux.push(entry.lux)
             });
 
-
+            // chamar funcao para desenhar o grafico
             designChart("chartTemp", arr_time, arr_temp)
             designChart("chartHum", arr_time, arr_hum)
             designChart("chartPress", arr_time, arr_press)
@@ -63,6 +73,12 @@
 
         })
 
+    /**
+     * args: time_stamp (string)
+     * converte a time_stamp para uma
+     * string com hora minuto e segundos
+     * return:  hh:mm:ss
+    */
     function hh_mm(time_stamp) {
         const date = new Date(time_stamp)
         return date.toLocaleTimeString('default', {
@@ -79,7 +95,8 @@
         gradientFill.addColorStop(0, "#1085ebaa");
         gradientFill.addColorStop(1, "#1085eb00");
 
-        
+        let  delayed
+
         new Chart(chartName, {
             type: "line",
             data: {
@@ -97,22 +114,30 @@
                 scales: {
                     yAxes: [{
                         ticks: {
-                            min: Math.min(...yValues),
-                            max: Math.max(...yValues)
+                            min: Math.min(...yValues) - 1,
+                            max: Math.max(...yValues) + 1,
+                            padding: 18,
+                            fontColor: "#0d0d0f"
                         },
                         gridLines: {
                             drawTicks: false,
-                            display: false
+                            display: false,
                         }
                     }],
-                }
+                    xAxes: [{
+                        ticks: {
+                            padding: 12,
+                            fontColor: "#0d0d0f"
+                        }
+                    }],
+                },
             }
         });
     }
 
-    window.setTimeout( function() {
-  window.location.reload();
-}, 20000);
+    window.setTimeout(function () {
+        window.location.reload();
+    }, 20000);
 </script>
 
 </html>
