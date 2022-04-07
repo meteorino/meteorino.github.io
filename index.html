@@ -1,184 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <link rel="stylesheet" href="./styles.css" />
-    <title>Meteorino</title>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Meteorino</title>
+</head>
 
-  <body>
-    <main>
-      <div class="left_side">
-        <h1 class="logo first">Meteor<span class="logo second">.ino</span></h1>
-        <div id="menu" class="menu">
-          <a class="item title">Estações</a>
+<body>
+  <main>
+    <div class="left_side">
+      <h1 class="logo first">Meteor<span class="logo second">.ino</span></h1>
+      <div id="menu" class="menu">
+        <a class="item title">Estações</a>
+      </div>
+    </div>
+
+    <div class="center_side">
+      <div class="control_panel">
+        <a class="button" onclick="changeRunning()">STOP</a>
+      </div>
+      <div class="chart_panel">
+        <div class="container">
+          <h2 class="title_chart">Temperatura</h2>
+          <canvas id="chartTemp" class="chart"></canvas>
+        </div>
+        <div class="container">
+          <h2 class="title_chart">Humidade</h2>
+          <canvas id="chartHum" class="chart"></canvas>
+        </div>
+        <div class="container">
+          <h2 class="title_chart">Pressão Atmosférica</h2>
+          <canvas id="chartPress" class="chart"></canvas>
+        </div>
+        <div class="container">
+          <h2 class="title_chart">Altitude</h2>
+          <canvas id="chartHeight" class="chart"></canvas>
+        </div>
+        <div class="container">
+          <h2 class="title_chart">Luminosidade</h2>
+          <canvas id="chartLux" class="chart"></canvas>
         </div>
       </div>
+    </div>
+  </main>
+</body>
+<script>
+  var list = document.getElementById("menu");
+  var actual_station = 0;
+  var isRunning = true;
 
-      <div class="center_side">
-        <div class="control_panel">
-            <a class="button">STOP</a>
-        </div>
-        <div class="chart_panel">
-          <div class="container">
-            <h2 class="title_chart">Temperatura</h2>
-            <canvas id="chartTemp" class="chart"></canvas>
-          </div>
-          <div class="container">
-            <h2 class="title_chart">Humidade</h2>
-            <canvas id="chartHum" class="chart"></canvas>
-          </div>
-          <div class="container">
-            <h2 class="title_chart">Pressão Atmosférica</h2>
-            <canvas id="chartPress" class="chart"></canvas>
-          </div>
-          <div class="container">
-            <h2 class="title_chart">Altitude</h2>
-            <canvas id="chartHeight" class="chart"></canvas>
-          </div>
-          <div class="container">
-            <h2 class="title_chart">Luminosidade</h2>
-            <canvas id="chartLux" class="chart"></canvas>
-          </div>
-        </div>
-      </div>
-    </main>
-  </body>
-  <script>
-    var list = document.getElementById("menu");
-    var actual_station = 0;
+  function changeRunning() {
+    var cmd = "start "
+    if (isRunning) {
+      cmd = "stop "
+    }
 
-    fetch("http://localhost:8080/stations/")
+    cmd += String(actual_station)
+
+    let headersList = {
+      "Content-Type": "application/json"
+    }
+
+    let bodyContent = JSON.stringify({
+      "cmd": `${cmd}`
+    });
+
+    fetch("http://localhost:8080/cmd/", {
+      method: "POST",
+      body: bodyContent,
+      headers: headersList
+    }).then(function (response) {
+      return response.text();
+    }).then(function (data) {
+      console.log(data);
+    })
+
+  }
+
+  fetch("http://localhost:8080/stations/")
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (entries) {
+      entries.forEach((entry) => {
+        var item = document.createElement("a");
+        item.className = "item";
+        item.innerHTML = "Estação " + entry.id_station;
+        item.setAttribute("onclick", `fetchData(${entry.id_station})`);
+        list.appendChild(item);
+      });
+    });
+
+  var last_element = 10;
+
+  fetchData(0);
+
+  function fetchData(id) {
+    actual_station = id;
+    var arr_time = [];
+    var arr_temp = [];
+    var arr_hum = [];
+    var arr_press = [];
+    var arr_heigth = [];
+    var arr_lux = [];
+
+    fetch(`http://localhost:8080/entries/id_station=${id}`)
       .then(function (response) {
         return response.json();
       })
       .then(function (entries) {
-        entries.forEach((entry) => {
-          var item = document.createElement("a");
-          item.className = "item";
-          item.innerHTML = "Estação " + entry.id_station;
-          item.setAttribute("onclick", `fetchData(${entry.id_station})`);
-          list.appendChild(item);
+        const last_entries = entries.slice(-last_element);
+        last_entries.forEach((entry) => {
+          // adicionar a cada array as variaveis
+          arr_time.push(hh_mm(entry.time_stamp));
+          arr_temp.push(entry.temperature);
+          arr_hum.push(entry.humidity);
+          arr_press.push(entry.pression);
+          arr_heigth.push(entry.height);
+          arr_lux.push(entry.lux);
         });
+
+        // chamar funcao para desenhar o grafico
+        designChart("chartTemp", arr_time, arr_temp);
+        designChart("chartHum", arr_time, arr_hum);
+        designChart("chartPress", arr_time, arr_press);
+        designChart("chartHeight", arr_time, arr_heigth);
+        designChart("chartLux", arr_time, arr_lux);
       });
+  }
 
-    var last_element = 10;
+  /**
+   * args: time_stamp (string)
+   * converte a time_stamp para uma
+   * string com hora minuto e segundos
+   * return:  hh:mm:ss
+   */
+  function hh_mm(time_stamp) {
+    const date = new Date(time_stamp);
+    return date.toLocaleTimeString("default", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
 
-    fetchData(0);
+  function designChart(chartName, xValues, yValues) {
+    graph = document.getElementById(chartName).getContext("2d");
 
-    function fetchData(id) {
-      actual_station = id;
-      var arr_time = [];
-      var arr_temp = [];
-      var arr_hum = [];
-      var arr_press = [];
-      var arr_heigth = [];
-      var arr_lux = [];
+    var gradientFill = graph.createLinearGradient(0, 0, 0, 500);
+    gradientFill.addColorStop(0, "#1085ebaa");
+    gradientFill.addColorStop(1, "#1085eb00");
 
-      fetch(`http://localhost:8080/entries/id_station=${id}`)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (entries) {
-          const last_entries = entries.slice(-last_element);
-          last_entries.forEach((entry) => {
-            // adicionar a cada array as variaveis
-            arr_time.push(hh_mm(entry.time_stamp));
-            arr_temp.push(entry.temperature);
-            arr_hum.push(entry.humidity);
-            arr_press.push(entry.pression);
-            arr_heigth.push(entry.height);
-            arr_lux.push(entry.lux);
-          });
-
-          // chamar funcao para desenhar o grafico
-          designChart("chartTemp", arr_time, arr_temp);
-          designChart("chartHum", arr_time, arr_hum);
-          designChart("chartPress", arr_time, arr_press);
-          designChart("chartHeight", arr_time, arr_heigth);
-          designChart("chartLux", arr_time, arr_lux);
-        });
-    }
-
-    /**
-     * args: time_stamp (string)
-     * converte a time_stamp para uma
-     * string com hora minuto e segundos
-     * return:  hh:mm:ss
-     */
-    function hh_mm(time_stamp) {
-      const date = new Date(time_stamp);
-      return date.toLocaleTimeString("default", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    }
-
-    function designChart(chartName, xValues, yValues) {
-      graph = document.getElementById(chartName).getContext("2d");
-
-      var gradientFill = graph.createLinearGradient(0, 0, 0, 500);
-      gradientFill.addColorStop(0, "#1085ebaa");
-      gradientFill.addColorStop(1, "#1085eb00");
-
-      let delayed;
-
-      new Chart(chartName, {
-        type: "line",
-        data: {
-          labels: xValues,
-          datasets: [
+    new Chart(chartName, {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [
+          {
+            fill: true,
+            backgroundColor: gradientFill, // Put the gradient here as a fill color
+            borderColor: "#1085eb",
+            borderWidth: 3,
+            data: yValues,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        legend: { display: false },
+        scales: {
+          yAxes: [
             {
-              fill: true,
-              backgroundColor: gradientFill, // Put the gradient here as a fill color
-              borderColor: "#1085eb",
-              borderWidth: 3,
-              data: yValues,
+              ticks: {
+                min: Math.min(...yValues) - 1,
+                max: Math.max(...yValues) + 1,
+                padding: 18,
+                fontColor: "#0d0d0f",
+              },
+              gridLines: {
+                drawTicks: false,
+                display: false,
+              },
+            },
+          ],
+          xAxes: [
+            {
+              ticks: {
+                padding: 12,
+                fontColor: "#0d0d0f",
+              },
             },
           ],
         },
-        options: {
-          responsive: true,
-          legend: { display: false },
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  min: Math.min(...yValues) - 1,
-                  max: Math.max(...yValues) + 1,
-                  padding: 18,
-                  fontColor: "#0d0d0f",
-                },
-                gridLines: {
-                  drawTicks: false,
-                  display: false,
-                },
-              },
-            ],
-            xAxes: [
-              {
-                ticks: {
-                  padding: 12,
-                  fontColor: "#0d0d0f",
-                },
-              },
-            ],
-          },
-        },
-      });
-    }
+      },
+    });
+  }
 
-    window.setTimeout(function () {
-      window.location.reload();
-    }, 20 * 1000);
-  </script>
+  window.setInterval(fetchData(last_element), 2 * 1000);
+
+</script>
+
 </html>
