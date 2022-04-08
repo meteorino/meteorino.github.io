@@ -5,76 +5,76 @@
   --green: #0bbd38;
   --black: #0d0d0f;
   --white: #fafafa;
-  --grey: #b6b9bd;
+  --grey: #e0e0e0;
   --color_btn: var(--red);
 }
 
 
 body {
+    width: 100%;
+    height: 100%;
     font-family: "Poppins";
     margin: 0;
     padding: 0;
 }
 
-main{
+/*------------- H E A D E R -------------*/
+.header {
     display: flex;
     flex-direction: row;
-    justify-content: safe;
+    padding-inline: 2rem;
+    padding-block: 0.5rem;
+    align-items: center;
+    box-shadow: 0px 0px 15px #888888;
+    justify-content: space-between;
 }
 
-/*------------- S I D E  B A R -------------*/
-.left_side{
-    padding-inline: 2rem;
-    background-color: aliceblue;
-    width: 25%;
-}
 /*** Logo ***/
 .logo {
     font-size: 38px;
     color: var(--black);
+    margin: 0;
 }
 
 .logo.second {
     color: var(--blue);
 }
-/*** Menu ***/
-.menu{
-    display: flex;
-    flex-direction: column;   
-    height: max-content;
-}
-.item{
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 300;
-    padding-block: 0.2rem;
-    padding-inline: 0.5rem;
-}
-.item.title{
-    border-radius: 10px;
-    color: var(--blue);
-    font-size: 24px;
-    font-weight: 600;
-    
-}
 
-.item:hover{
-    font-weight: 600;
-}
 
 /*** Dashboard ***/
 .center_side{
-    width: 75%;
     padding-inline: 50px;
+    padding-inline: 2rem;
+    padding-block: 2rem;
 }
 
 .control_panel{
     display: flex;
     flex-direction: row;
     color: var(--black);
-    margin-top: 2rem;
-    margin-bottom: 3rem;
-    justify-content: space-evenly;
+    justify-content: space-between;
+}
+
+.selector{
+    width: 8rem;  
+    background-color: var(--white);
+    border: 3px solid var(--black);
+    color: var(--black);
+    font-weight: 600;
+    border-radius: 10px;
+    padding-block: 0.3rem;
+    padding-inline: 1rem;
+}
+
+option {
+    width: 8rem;  
+    background-color: var(--white);
+    border: 3px solid var(--black);
+    color: var(--black);
+    font-weight: 600;
+    border-radius: 10px;
+    padding-block: 0.3rem;
+    padding-inline: 1rem;
 }
 
 .button{
@@ -87,6 +87,7 @@ main{
     padding-block: 0.3rem;
     padding-inline: 1rem;
     transition: 0.1s;
+    user-select: none;  
 }
 
 .button:hover{
@@ -110,5 +111,28 @@ main{
     width: 600px;
 }
 
+/********** FOOTER ***************/
+footer {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 2rem;
+    padding-block: 2rem;
+    background-color: var(--grey);
+}
 
+.apoios{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+
+
+.image{
+    height: 3rem;
+}
+
+.image.qr{
+    height: 6rem;
+}
 

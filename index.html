@@ -6,23 +6,23 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="stylesheet" href="./styles.css" />
   <title>Meteorino</title>
 </head>
 
 <body>
+  <header class="header">
+    <h1 class="logo first">Meteor<span class="logo second">.ino</span></h1>
+      <a href="https://meteorino.github.io">
+        <img class="image qr" src="./res/site_qr.svg" alt="Site">
+      </a>
+  </header>
   <main>
-    <div class="left_side">
-      <h1 class="logo first">Meteor<span class="logo second">.ino</span></h1>
-      <div id="menu" class="menu">
-        <a class="item title">Estações</a>
-      </div>
-    </div>
-
     <div class="center_side">
       <div class="control_panel">
-        <a class="button" onclick="changeRunning()">STOP</a>
+        <select id="selector" class="selector" onchange="fetchData(this.value)"></select>
+        <a class="button" id="btn_start_stop" onclick="fetchRunning()">STOP</a>
       </div>
       <div class="chart_panel">
         <div class="container">
@@ -48,38 +48,72 @@
       </div>
     </div>
   </main>
+  <footer>
+    <div class="apoios">
+      <a href="https://www.eng.uminho.pt/pt">
+        <img class="image" src="./res/uminho.png" alt="Universidade do Minho">
+      </a>
+      <a href="https://netiuminho.github.io">
+        <img class="image" src="./res/netium.png" alt="NETIUM">
+      </a>
+    </div>
+  </footer>
 </body>
 <script>
-  var list = document.getElementById("menu");
+  var list = document.getElementById("selector");
+  var button = document.getElementById("btn_start_stop");
   var actual_station = 0;
   var isRunning = true;
 
-  function changeRunning() {
-    var cmd = "start "
-    if (isRunning) {
-      cmd = "stop "
-    }
+  /**
+   * O root é onde se encontram os nossos 'defines'
+   * em CSS, sen que contem na sua maioria cores
+   */
+  var root = document.querySelector(":root");
+  var rs = getComputedStyle(root);
+  /**
+   * Funcao implementada sempre que
+   * é pressionado o butao de STOP/START~
+   */
+  function fetchRunning() {
+    var cmd = "start ";
 
-    cmd += String(actual_station)
+    if (isRunning) {
+      cmd = "stop ";
+    }
+    // constroi o comando 'stop x' ou 'start x'
+    cmd += String(actual_station);
 
     let headersList = {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    };
 
     let bodyContent = JSON.stringify({
-      "cmd": `${cmd}`
+      cmd: `${cmd}`,
     });
 
     fetch("http://localhost:8080/cmd/", {
       method: "POST",
       body: bodyContent,
-      headers: headersList
+      headers: headersList,
     }).then(function (response) {
-      return response.text();
-    }).then(function (data) {
-      console.log(data);
-    })
+      console.log(response.status);
+      if (response.status == 200) {
+        isRunning = !isRunning
+        changeButton(isRunning)
+      }
+    });
+  }
 
+  function changeButton(run) {
+    var clr_btn = rs.getPropertyValue("--green");
+    var text_btn = "START";
+    if (run) {
+      clr_btn = rs.getPropertyValue("--red");
+      text_btn = "STOP";
+    }
+    root.style.setProperty("--color_btn", clr_btn);
+    button.innerHTML = text_btn;
   }
 
   fetch("http://localhost:8080/stations/")
@@ -87,21 +121,24 @@
       return response.json();
     })
     .then(function (entries) {
+      actual_station = entries[0].id_station;
       entries.forEach((entry) => {
-        var item = document.createElement("a");
+        var item = document.createElement("option");
         item.className = "item";
+        item.value = entry.id_station;
         item.innerHTML = "Estação " + entry.id_station;
-        item.setAttribute("onclick", `fetchData(${entry.id_station})`);
         list.appendChild(item);
       });
     });
 
   var last_element = 10;
 
-  fetchData(0);
+  fetchData(actual_station);
 
   function fetchData(id) {
+    console.log(">> Selecting station " + id);
     actual_station = id;
+
     var arr_time = [];
     var arr_temp = [];
     var arr_hum = [];
@@ -109,11 +146,13 @@
     var arr_heigth = [];
     var arr_lux = [];
 
-    fetch(`http://localhost:8080/entries/id_station=${id}`)
+
+      fetch(`http://localhost:8080/entries/${id}/`)
       .then(function (response) {
         return response.json();
       })
       .then(function (entries) {
+
         const last_entries = entries.slice(-last_element);
         last_entries.forEach((entry) => {
           // adicionar a cada array as variaveis
@@ -125,13 +164,13 @@
           arr_lux.push(entry.lux);
         });
 
-        // chamar funcao para desenhar o grafico
         designChart("chartTemp", arr_time, arr_temp);
         designChart("chartHum", arr_time, arr_hum);
         designChart("chartPress", arr_time, arr_press);
         designChart("chartHeight", arr_time, arr_heigth);
         designChart("chartLux", arr_time, arr_lux);
       });
+
   }
 
   /**
@@ -201,8 +240,9 @@
     });
   }
 
-  window.setInterval(fetchData(last_element), 2 * 1000);
-
+  setInterval(function () {
+    fetchData(actual_station);
+  }, 5 * 1000);
 </script>
 
 </html>
