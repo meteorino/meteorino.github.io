@@ -47,8 +47,8 @@ h2{
     flex-direction: row;
     color: var(--black);
     justify-content: space-between;
-    padding-inline: 1rem;
-    padding-top: 1rem;
+    padding-inline: 2rem;
+    padding-top: 1.5rem;
 }
 
 .selector{
@@ -85,8 +85,8 @@ option {
     padding-block: 0.1rem;
     padding-inline: 0.3rem;
     transition: 0.1s;
-    user-select: none;  
-    font-size: 12px;
+    user-select: none;
+    font-size: 14px;
 }
 
 .button:hover{
@@ -96,16 +96,12 @@ option {
 
 .chart_panel{
     display: flex;  
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content:space-evenly;
-    padding-inline: 1rem;
+    flex-direction: column;
+    padding-inline: 2rem;
 }
-
 .chart{
-    width: 80%;
+    padding-block: 1rem;
 }
-
 footer {
     display: flex;
     flex-direction: column;
